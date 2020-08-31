@@ -21,10 +21,13 @@ class ScrapingController extends Controller
     public function scraping(){
         $client = new Client();
         $crawler = $client->request('GET', 'https://www.americatv.com.pe/noticias/');
-        $styles = 'fluid-list cnt-grid-b';
+        // $styles = 'fluid-list item-grid';
+        $styles = 'port-noti-img boxgrid';
         $array2 = new ArrayObject();
         $crawler->filter("[class='$styles']")->each(function ($node, $i) use($array2) {
             $noticia = new stdClass();
+            $noticia->img = $node->filter('img')->eq(0)->attr('data-src');
+            $noticia->url = $node->filter('a')->eq(0)->attr('href');
             $noticia->texto = $node->text();
             $array2->append($noticia);
         });
