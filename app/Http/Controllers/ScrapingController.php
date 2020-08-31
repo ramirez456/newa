@@ -18,21 +18,29 @@ class ScrapingController extends Controller
         //
     }
 
-    public function scraping(){
+    public function main(){
         $client = new Client();
         $crawler = $client->request('GET', 'https://www.americatv.com.pe/noticias/');
-        // $styles = 'fluid-list item-grid';
         $styles = 'port-noti-img boxgrid';
         $array2 = new ArrayObject();
         $crawler->filter("[class='$styles']")->each(function ($node, $i) use($array2) {
-            $noticia = new stdClass();
-            $noticia->img = $node->filter('img')->eq(0)->attr('data-src');
-            $noticia->url = $node->filter('a')->eq(0)->attr('href');
-            $noticia->texto = $node->text();
-            $array2->append($noticia);
+            $new = new stdClass();
+            $new->img = $node->filter('img')->eq(0)->attr('data-src');
+            $new->url = $node->filter('a')->eq(0)->attr('href');
+            $new->texto = $node->text();
+            $array2->append($new);
         });
         $json = json_encode($array2);
         return $json;
+    }
+    public function detail(Request $request){
+        $detailClient = new Client();
+        $crawler = $detailClient->request('GET', $request->url);
+        $article = new stdClass();
+        $article->title = $crawler->filter("[id='txtlink']")->first()->text();
+        $article->text = $crawler->filter("[class='bajada-text']")->first()->text();
+        $article->long_text = $crawler->filter("[class='cont_p']")->first()->text();
+        return json_encode($article);
     }
 
     /**
