@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Goutte\Client;
 use stdClass;
+use ArrayObject;
 class ScrapingController extends Controller
 {
     /**
@@ -18,25 +19,17 @@ class ScrapingController extends Controller
     }
 
     public function scraping(){
-
-
         $client = new Client();
         $crawler = $client->request('GET', 'https://www.americatv.com.pe/noticias/');
         $styles = 'fluid-list cnt-grid-b';
-        $noticia = new stdClass();
-        $array2 = array();
+        $array2 = new ArrayObject();
         $crawler->filter("[class='$styles']")->each(function ($node, $i) use($array2) {
             $noticia = new stdClass();
             $noticia->texto = $node->text();
-            $array2[$i]=json_encode($noticia);
-            // \Log::alert($i);
-            // \Log::alert($array2);
+            $array2->append($noticia);
         });
-        \Log::alert($array2);
         $json = json_encode($array2);
-        \Log::alert($json);
-        \Log::alert($array2);
-        return $array2;
+        return $json;
     }
 
     /**
